@@ -7,7 +7,7 @@ namespace Prodemos.Infrastructure.Persistence;
 public class ProdemosDbContextData
 {
     public static async Task LoadDataASync(
-        ProdemosDbContext prodemosDbContext,
+        ProdemosDbContext context,
         UserManager<User> userManager,
         RoleManager<IdentityRole> roleManager,
         ILoggerFactory loggerFactory
@@ -26,6 +26,7 @@ public class ProdemosDbContextData
                 {
                     FullName = "Admin",
                     Email = "admin@gmail.com",
+                    UserName = "admin",
                     PhoneNumber = "1234567890",
                 };
 
@@ -36,11 +37,13 @@ public class ProdemosDbContextData
                 {
                     FullName = "Juan Perez",
                     Email = "juan_perez@gmail.com",
+                    UserName = "juan.perez",
                     PhoneNumber = "1234567891",
                 };
 
                 await userManager.CreateAsync(newUser);
                 await userManager.AddToRoleAsync(newUser, Role.USER);
+                await context.SaveChangesAsync();
             }
 
         }

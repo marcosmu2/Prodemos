@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Prodemos.Domain;
+using Prodemos.Domain.Configuration;
 
 namespace Prodemos.Infrastructure.Persistence;
 public class ProdemosDbContext : IdentityDbContext<User>
@@ -24,5 +25,6 @@ public class ProdemosDbContext : IdentityDbContext<User>
         builder.Entity<User>().Property(x => x.NormalizedUserName).HasMaxLength(90);
         builder.Entity<IdentityRole>().Property(x => x.Id).HasMaxLength(36);
         builder.Entity<IdentityRole>().Property(x => x.NormalizedName).HasMaxLength(90);
+        builder.ApplyConfigurationsFromAssembly(typeof(MatchConfiguration).Assembly);
     }
 }

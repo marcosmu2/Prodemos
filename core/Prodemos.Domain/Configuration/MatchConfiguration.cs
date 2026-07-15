@@ -6,23 +6,15 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
 {
     public void Configure(EntityTypeBuilder<Match> builder)
     {
-        builder.HasMany(m => m.UserGuests)
-               .WithOne(ug => ug.Match)
-               .HasForeignKey(m => m.MatchId)
-               .IsRequired()
+        builder.HasOne(m => m.TeamA)
+               .WithMany(t => t.MatchesAsTeamA)
+               .HasForeignKey(m => m.TeamAId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.TeamA)
-               .WithMany(ta => ta.Matches)
-               .HasForeignKey(ta => ta.TeamAId)
-               .IsRequired()
-               .OnDelete(DeleteBehavior.SetNull);
-
         builder.HasOne(m => m.TeamB)
-               .WithMany(tb => tb.Matches)
-               .HasForeignKey(tb => tb.TeamBId)
-               .IsRequired()
-               .OnDelete(DeleteBehavior.SetNull);
+               .WithMany(t => t.MatchesAsTeamB)
+               .HasForeignKey(m => m.TeamBId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(m => m.MatchStatus).HasConversion(
             m => m.ToString(),

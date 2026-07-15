@@ -1,5 +1,5 @@
 ﻿namespace Prodemos.Domain;
-public class UserPlay
+public class UserPlay : BaseDomainModel
 {
     public Guid UserId { get; set; }
     public Guid ChampionshipId { get; set; }
