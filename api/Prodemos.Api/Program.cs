@@ -1,12 +1,15 @@
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Prodemos.Application.Models.Email;
+using Prodemos.Application.Services.Interfaces;
 using Prodemos.Domain;
 using Prodemos.Infrastructure.Persistence;
+using Prodemos.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +58,17 @@ builder.Services.AddCors(options =>
     .AllowAnyHeader()
     );
 });
+
+builder.Services.AddTransient<IManageImageService, ManageImageService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+
+builder.Services.Configure<EmailFluentSettings>(builder.Configuration.GetSection(nameof(EmailFluentSettings)));
+var emailSettings = builder.Configuration.GetSection(nameof(EmailFluentSettings));
+var fromEmail = emailSettings.GetValue<String>("Email");
+var host = emailSettings.GetValue<String>("Host");
+var port = emailSettings.GetValue<int>("Port");
+builder.Services.AddFluentEmail(fromEmail).AddSmtpSender(host,port);
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
