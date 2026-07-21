@@ -10,6 +10,7 @@ using Prodemos.Application.Behaviour;
 using Prodemos.Application.Models.Email;
 using Prodemos.Application.Models.Token;
 using Prodemos.Application.Persistence;
+using Prodemos.Application.Services.Authorization.Command;
 using Prodemos.Application.Services.Interfaces;
 using Prodemos.Domain;
 using Prodemos.Infrastructure.Persistence;
@@ -25,6 +26,8 @@ builder.Services.AddDbContext<ProdemosDbContext>(options =>
     b => b.MigrationsAssembly(typeof(ProdemosDbContext).Assembly.FullName)
     )
 );
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
 
 builder.Services.AddControllers(opt =>
 {

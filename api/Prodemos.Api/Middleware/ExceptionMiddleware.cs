@@ -53,8 +53,8 @@ public class ExceptionMiddleware
             {
                 
                     result = JsonConvert.SerializeObject(
-                        new CodeErrorException(statusCode,
-                                            new string[] { ex.Message }, ex.StackTrace ?? ""));
+                        new CodeErrorResponse(statusCode,
+                                            new string[] { ex.Message }));
                 
             }
 
