@@ -1,14 +1,19 @@
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Prodemos.Api.Middleware;
+using Prodemos.Application.Behaviour;
 using Prodemos.Application.Models.Email;
+using Prodemos.Application.Models.Token;
+using Prodemos.Application.Persistence;
 using Prodemos.Application.Services.Interfaces;
 using Prodemos.Domain;
 using Prodemos.Infrastructure.Persistence;
+using Prodemos.Infrastructure.Repositories;
 using Prodemos.Infrastructure.Services;
 using System.Text;
 
@@ -67,8 +72,18 @@ var emailSettings = builder.Configuration.GetSection(nameof(EmailFluentSettings)
 var fromEmail = emailSettings.GetValue<String>("Email");
 var host = emailSettings.GetValue<String>("Host");
 var port = emailSettings.GetValue<int>("Port");
-builder.Services.AddFluentEmail(fromEmail).AddSmtpSender(host,port);
+builder.Services.AddFluentEmail(fromEmail).AddSmtpSender(host, port);
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
+
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -82,6 +97,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
