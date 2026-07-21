@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Prodemos.Application.Dtos.Authorization;
 using Prodemos.Application.Services.Authorization.Command;
@@ -25,5 +24,14 @@ public class AuthorizationController : ControllerBase
     {
         var response = await _mediator.Send(loginUserCommand);
         return Ok(response);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("register")]
+    //[ProducesResponseType((int)HttpStatusCode.OK)]
+    public async Task<ActionResult<string>> Register(RegisterCommand registerCommand)
+    {
+        var response = await _mediator.Send(registerCommand);
+        return response ? Ok("User created succesfully") : BadRequest("User cannot be created");
     }
 }
