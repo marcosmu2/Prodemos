@@ -3,6 +3,6 @@
 namespace Prodemos.Application.Services.Interfaces;
 public interface IAuthService
 {
-    string GetSessionUser();
+    string GetSessionUserEmail();
     string CreateToken(User user, IList<string>? roles); 
 }

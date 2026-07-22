@@ -27,11 +27,18 @@ public class AuthorizationController : ControllerBase
     }
 
     [AllowAnonymous]
-    [HttpGet("register")]
+    [HttpPost("register")]
     //[ProducesResponseType((int)HttpStatusCode.OK)]
     public async Task<ActionResult<string>> Register(RegisterCommand registerCommand)
     {
         var response = await _mediator.Send(registerCommand);
         return response ? Ok("User created succesfully") : BadRequest("User cannot be created");
+    }
+
+    [HttpPost("updateUser")]
+    public async Task<ActionResult<string>> UpdateUser(UpdateUserCommand updateUserCommand)
+    {
+        var response = await _mediator.Send(updateUserCommand);
+        return response ? Ok("User updated succesfully") : BadRequest("User cannot be updated");
     }
 }
