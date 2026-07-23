@@ -30,7 +30,7 @@ public class ProdemosDbContextData
                     PhoneNumber = "1234567890",
                 };
 
-                await userManager.CreateAsync(userAdmin);
+                await userManager.CreateAsync(userAdmin, "Nal17amj123456789=");
                 await userManager.AddToRoleAsync(userAdmin, Role.ADMIN);
 
                 User newUser = new()
@@ -41,7 +41,7 @@ public class ProdemosDbContextData
                     PhoneNumber = "1234567891",
                 };
 
-                await userManager.CreateAsync(newUser);
+                await userManager.CreateAsync(newUser, "PasswordJuanPerez123$");
                 await userManager.AddToRoleAsync(newUser, Role.USER);
                 await context.SaveChangesAsync();
             }

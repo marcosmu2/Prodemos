@@ -25,7 +25,7 @@ public class AuthService : IAuthService
         var claims = new List<Claim> {
             new Claim(JwtRegisteredClaimNames.NameId, usuario.UserName!),
             new Claim("userId", usuario.Id),
-            new Claim("email", usuario.Email!)
+            new Claim(ClaimTypes.Email, usuario.Email!)
         };
 
         foreach (var rol in roles!)
@@ -49,10 +49,10 @@ public class AuthService : IAuthService
         return tokenHandler.WriteToken(token);
     }
 
-    public string GetSessionUser()
+    public string GetSessionUserEmail()
     {
         var username = _httpContextAccessor.HttpContext!.User?.Claims?
-                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+                .FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
         return username!;
     }

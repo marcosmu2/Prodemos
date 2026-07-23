@@ -40,7 +40,7 @@ public class ExceptionMiddleware
                     var errors = validationException.Errors.Select(ers => ers.ErrorMessage).ToArray();
                     var validationJsons = JsonConvert.SerializeObject(errors);
                     result = JsonConvert.SerializeObject(
-                        new CodeErrorException(statusCode, errors, validationJsons)
+                        new CodeErrorResponse(statusCode, errors)
                     );
                     break;
 
@@ -53,8 +53,8 @@ public class ExceptionMiddleware
             {
                 
                     result = JsonConvert.SerializeObject(
-                        new CodeErrorException(statusCode,
-                                            new string[] { ex.Message }, ex.StackTrace ?? ""));
+                        new CodeErrorResponse(statusCode,
+                                            new string[] { ex.Message }));
                 
             }
 

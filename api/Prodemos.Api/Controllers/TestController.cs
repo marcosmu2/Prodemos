@@ -29,4 +29,17 @@ public class TestController : ControllerBase
         var result = await _emailService.SendEmailAsync(emailMessage, "Este_Es_Mi_Token");
         return result ? Ok() : BadRequest();  
     }
+
+    [AllowAnonymous]
+    [HttpGet("getKey")]
+    public ActionResult<string> GetKey()
+    {
+        var key = new byte[64]; // 512 bits
+        using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(key);
+        }
+        var base64Key = Convert.ToBase64String(key);
+        return Ok(base64Key);
+    }
 }
