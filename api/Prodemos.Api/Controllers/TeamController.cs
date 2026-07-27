@@ -19,7 +19,7 @@ public class TeamController : ControllerBase
 
     [HttpPost("create")]
     [RequireAdmin]
-    public async Task<ActionResult<TeamResponseDto>> CreateTeam(CreateTeamCommand createTeamCommand)
+    public async Task<ActionResult<TeamResponseDto>> CreateTeam([FromForm]CreateTeamCommand createTeamCommand)
     {
         var response = await _mediator.Send(createTeamCommand);
         return Ok(response);
@@ -35,11 +35,11 @@ public class TeamController : ControllerBase
 
     [HttpDelete("delete/{id}")]
     [RequireAdmin]
-    public async Task<ActionResult<bool>> DeleteTeam(Guid id)
+    public async Task<ActionResult> DeleteTeam(Guid id)
     {
         var deleteTeamCommand = new DeleteTeamCommand() { Id = id };
         var response = await _mediator.Send(deleteTeamCommand);
-        return Ok(response);
+        return response ? Ok() : BadRequest();
     }
 
     [HttpGet("getAll")]
