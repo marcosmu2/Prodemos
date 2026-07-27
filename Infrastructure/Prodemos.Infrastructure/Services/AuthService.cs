@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Prodemos.Application.Models.Token;
@@ -55,5 +56,18 @@ public class AuthService : IAuthService
                 .FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
         return username!;
+    }
+
+    public bool IsAdmin()
+    {
+        var roles = _httpContextAccessor.HttpContext!.User?.Claims?.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value) ?? new List<string>();
+        foreach (var rol in roles)
+        {
+            if (rol == nameof(Role.Admin).ToUpper())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

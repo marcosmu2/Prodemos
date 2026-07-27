@@ -31,8 +31,8 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, bool>
             throw new BadRequestException($"Email {_authService.GetSessionUserEmail()} does not exist");
         }
 
-        userByEmail.PhoneNumber = string.IsNullOrEmpty(request.PhoneNumber) ? userByEmail.PhoneNumber : request.PhoneNumber;
-        userByEmail.FullName = string.IsNullOrEmpty(request.FullName) ? userByEmail.FullName : request.FullName;
+        userByEmail.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? userByEmail.PhoneNumber : request.PhoneNumber;
+        userByEmail.FullName = string.IsNullOrWhiteSpace(request.FullName) ? userByEmail.FullName : request.FullName;
 
         if (string.IsNullOrEmpty(request.Password))
         {
@@ -40,9 +40,9 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, bool>
             userByEmail.PasswordHash = hashedNewPassword;
         }
 
-        var resultado = await _userManager.UpdateAsync(userByEmail);
+        var result = await _userManager.UpdateAsync(userByEmail);
 
-        if (!resultado.Succeeded)
+        if (!result.Succeeded)
         {
             throw new Exception("Cannot update the user");
         }

@@ -4,5 +4,6 @@ namespace Prodemos.Application.Services.Interfaces;
 public interface IAuthService
 {
     string GetSessionUserEmail();
-    string CreateToken(User user, IList<string>? roles); 
+    bool IsAdmin();
+    string CreateToken(User user, IList<string>? roles);
 }
