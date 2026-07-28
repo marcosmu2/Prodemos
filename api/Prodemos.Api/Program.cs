@@ -1,3 +1,4 @@
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -6,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Prodemos.Api.Middleware;
+using Prodemos.Application;
 using Prodemos.Application.Behaviour;
+using Prodemos.Application.Dtos.Team;
 using Prodemos.Application.Models.Email;
 using Prodemos.Application.Models.Token;
 using Prodemos.Application.Persistence;
 using Prodemos.Application.Services.Authorization.Command;
 using Prodemos.Application.Services.Interfaces;
+using Prodemos.Application.Validators.Teams;
 using Prodemos.Domain;
 using Prodemos.Infrastructure.Persistence;
 using Prodemos.Infrastructure.Repositories;
 using Prodemos.Infrastructure.Services;
+using FluentValidation;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +34,12 @@ builder.Services.AddDbContext<ProdemosDbContext>(options =>
 );
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
+
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile(new MappingProfile()));
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateTeamCommandValidator>();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
 builder.Services.AddControllers(opt =>
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Prodemos.Application.Persistence;
+using Prodemos.Domain;
 using Prodemos.Infrastructure.Persistence;
 using System.Linq.Expressions;
 
