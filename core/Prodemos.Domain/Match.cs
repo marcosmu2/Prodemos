@@ -10,5 +10,5 @@ public class Match : BaseDomainModel
     public virtual Team? TeamA { get; set; }
     public virtual Team? TeamB { get; set; }
     public virtual Championship? Championship { get; set;}
-    public virtual ICollection<UserGuest>? UserGuests { get; set; }
+    public virtual ICollection<UserGuest> UserGuests { get; set; } = new List<UserGuest>();
 }

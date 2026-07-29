@@ -19,7 +19,7 @@ public class TeamController : ControllerBase
 
     [HttpPost("create")]
     [RequireAdmin]
-    public async Task<ActionResult<TeamResponseDto>> CreateTeam([FromForm]CreateTeamCommand createTeamCommand)
+    public async Task<ActionResult<TeamResponseDto>> CreateTeam(CreateTeamCommand createTeamCommand)
     {
         var response = await _mediator.Send(createTeamCommand);
         return Ok(response);

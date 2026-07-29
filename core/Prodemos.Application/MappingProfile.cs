@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Prodemos.Application.Dtos.Championship;
 using Prodemos.Application.Dtos.Team;
 using Prodemos.Domain;
 
@@ -8,5 +9,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<Team, TeamResponseDto>();
+        CreateMap<Championship, ChampionshipResponseDto>();
+        CreateMap<Match, ChampionshipMatchDto>();
     }
 }
