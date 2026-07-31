@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Prodemos.Application.Dtos.Championship;
 using Prodemos.Application.Exceptions;
 using Prodemos.Application.Persistence;
@@ -45,24 +46,39 @@ public class CreateChampionshipCommandHandler : IRequestHandler<CreateChampionsh
 
         if (requestMatches is not null && requestMatches.Any())
         {
-            foreach (var match in requestMatches)
-            {
-                var newMatch = new Match
-                {
-                    TeamAId = match.TeamAId,
-                    TeamBId = match.TeamBId,
-                    MatchStatus = MatchStatus.Upcoming,
-                    ChampionshipId = newChampionshipId
-                };
-
-                _unitOfWOrk.Repository<Match>().AddEntity(newMatch);
-            }
+            CreateMatches(newChampionshipId, requestMatches);
         }
 
         await _unitOfWOrk.Complete();
 
-        newChampionship = await _unitOfWOrk.Repository<Championship>().GetByIdAsync(newChampionshipId);
+        newChampionship = await GetChampionship(newChampionshipId, newChampionship);
 
         return _mapper.Map<ChampionshipResponseDto>(newChampionship);
+    }
+
+    private async Task<Championship> GetChampionship(Guid newChampionshipId, Championship newChampionship)
+    {
+        var include = new Func<IQueryable<Championship>, IQueryable<Championship>>(c =>
+        c.Include(x => x.Matches).ThenInclude(y => y.TeamA)
+        .Include(x => x.Matches).ThenInclude(z => z.TeamB));
+
+        newChampionship = await _unitOfWOrk.Repository<Championship>().GetEntityAsync(x => x.Id == newChampionshipId, include);
+        return newChampionship;
+    }
+
+    private void CreateMatches(Guid newChampionshipId, ICollection<ChampionshipMatchRequestDto> requestMatches)
+    {
+        foreach (var match in requestMatches)
+        {
+            var newMatch = new Match
+            {
+                TeamAId = match.TeamAId,
+                TeamBId = match.TeamBId,
+                MatchStatus = MatchStatus.Upcoming,
+                ChampionshipId = newChampionshipId
+            };
+
+            _unitOfWOrk.Repository<Match>().AddEntity(newMatch);
+        }
     }
 }

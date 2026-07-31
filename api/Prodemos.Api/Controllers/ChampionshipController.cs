@@ -34,4 +34,24 @@ public class ChampionshipController : ControllerBase
         var response = await _mediator.Send(createChampionshipCommand);
         return Ok(response);
     }
+
+    [HttpPut("update")]
+    [RequireAdmin]
+    public async Task<ActionResult<ChampionshipResponseDto>> UpdateChampionship(UpdateChampionshipCommand updateChampionshipCommand)
+    {
+        var response = await _mediator.Send(updateChampionshipCommand);
+        return Ok(response);
+    }
+
+    [HttpDelete("delete/{id}")]
+    [RequireAdmin]
+    public async Task<ActionResult<string>> DeleteChampionship(Guid id)
+    {
+        var deletecommand = new DeleteChampioshipCommand()
+        {
+            Id = id,
+        };
+
+        return await _mediator.Send(deletecommand) ? Ok("Championship deleted successfully") : BadRequest();
+    }
 }
