@@ -27,16 +27,16 @@ public class UpdateChampionshipCommandHandler : IRequestHandler<UpdateChampionsh
 
     public async Task<ChampionshipResponseDto> Handle(UpdateChampionshipCommand request, CancellationToken cancellationToken)
     {
-        if (await _unitOfWOrk.Repository<Championship>().Exist(x => x.Name == request.Name))
-        {
-            throw new BadRequestException($"A {nameof(Championship)} with name {request.Name} have already exist");
-        }
-
         var championshipToUpdate = await _unitOfWOrk.Repository<Championship>().GetByIdAsync(request.Id);
 
         if (championshipToUpdate is null)
         {
             throw new BadRequestException($"Not exist a {nameof(Championship)} with id {request.Id}");
+        }
+
+        if (await _unitOfWOrk.Repository<Championship>().Exist(x => x.Name == request.Name))
+        {
+            throw new BadRequestException($"A {nameof(Championship)} with name {request.Name} have already exist");
         }
 
         championshipToUpdate.Name = string.IsNullOrWhiteSpace(request.Name) ? championshipToUpdate.Name : request.Name.Trim();
