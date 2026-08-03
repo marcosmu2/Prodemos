@@ -1,6 +1,9 @@
 ﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Prodemos.Domain;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MatchStatus
 {
     [EnumMember(Value = "Upcoming")]

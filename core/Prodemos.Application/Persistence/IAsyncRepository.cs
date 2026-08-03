@@ -18,7 +18,7 @@ public interface IAsyncRepository<T> where T : class
                                    bool disableTracking = true);
 
     Task<T> GetEntityAsync(Expression<Func<T, bool>>? predicate,
-                                     List<Expression<Func<T, object>>>? includes = null,
+                                     Func<IQueryable<T>, IQueryable<T>>? include = null,
                                    bool disableTracking = true);
     Task<T> GetByIdAsync(Guid id);
 
@@ -27,6 +27,8 @@ public interface IAsyncRepository<T> where T : class
     Task<T> UpdateAsync(T entity);
 
     Task DeleteAsync(T entity);
+
+    Task<bool> Exist(Expression<Func<T, bool>> predicate);
 
     void AddEntity(T entity);
 

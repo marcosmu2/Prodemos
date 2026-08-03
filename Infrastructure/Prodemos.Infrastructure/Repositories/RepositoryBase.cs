@@ -47,6 +47,11 @@ public class RepositoryBase<T> : IAsyncRepository<T> where T : class
         _context.Set<T>().RemoveRange(entities);
     }
 
+    public async Task<bool> Exist(Expression<Func<T, bool>> predicate)
+    {
+        return await _context.Set<T>().AnyAsync(predicate);
+    }
+
     public async Task<IReadOnlyList<T>> GetAllAsync()
     {
         return await _context.Set<T>().ToListAsync();
@@ -92,12 +97,12 @@ public class RepositoryBase<T> : IAsyncRepository<T> where T : class
         return (await _context.Set<T>().FindAsync(id))!;
     }
 
-    public async Task<T> GetEntityAsync(Expression<Func<T, bool>>? predicate, List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true)
+    public async Task<T> GetEntityAsync(Expression<Func<T, bool>>? predicate, Func<IQueryable<T>, IQueryable<T>>? include = null, bool disableTracking = true)
     {
         IQueryable<T> query = _context.Set<T>();
         if (disableTracking) query = query.AsNoTracking();
 
-        if (includes != null) query = includes.Aggregate(query, (current, include) => current.Include(include));
+        if (include != null) query = include(query);
 
         if (predicate != null) query = query.Where(predicate);
         return (await query.FirstOrDefaultAsync())!;
