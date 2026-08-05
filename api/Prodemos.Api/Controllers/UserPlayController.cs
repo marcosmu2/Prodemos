@@ -22,4 +22,15 @@ public class UserPlayController : ControllerBase
     {
         return Ok(await _mediator.Send(createUserPlayCommand));
     }
+
+    [HttpDelete("delete/{id}")]
+    [RequireAdmin]
+    public async Task<ActionResult<string>> DeleteUserPlay(Guid id)
+    {
+        DeleteUserPlayCommand deleteUserPlayCommand = new()
+        {
+            Id = id
+        };
+        return await _mediator.Send(deleteUserPlayCommand) ? Ok("UserPlay deleted succesfully") : BadRequest();
+    }
 }
