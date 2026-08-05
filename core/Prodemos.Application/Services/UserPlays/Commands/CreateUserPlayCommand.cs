@@ -38,7 +38,8 @@ public class CreateUserPlayCommandHandler : IRequestHandler<CreateUserPlayComman
             throw new BadRequestException($"Not exist a {nameof(Championship)} with id {request.ChampionshipId}");
         }
 
-        var user = await _userManager.FindByEmailAsync(_authService.GetSessionUserEmail());
+        Guid userId = await GetUserId(request);
+
         var newUserPlayId = Guid.NewGuid();
 
         UserPlay newUserPlay = new()
@@ -46,33 +47,56 @@ public class CreateUserPlayCommandHandler : IRequestHandler<CreateUserPlayComman
             Id = newUserPlayId,
             ChampionshipId = (Guid)request.ChampionshipId!,
             Points = 0,
-            UserId = Guid.Parse(user!.Id)
+            UserId = userId
         };
 
         _unitOfWOrk.Repository<UserPlay>().AddEntity(newUserPlay);
 
         foreach (var userGuest in request.UserGuests)
         {
-            UserGuest newUserGuest = new()
-            {
-                MatchId = (Guid)userGuest.MatchId!,
-                ScoreTeamAGuessed = (int)userGuest.ScoreTeamAGuessed!,
-                ScoreTeamBGuessed = (int)userGuest.ScoreTeamBGuessed!,
-                GuessStatus = GuessStatus.Sealed,
-                UserPlayId = newUserPlayId,
-            };
-
-            _unitOfWOrk.Repository<UserGuest>().AddEntity(newUserGuest);
+            CreateUserGuests(newUserPlayId, userGuest);
         }
 
         await _unitOfWOrk.Complete();
-
-        var include = new Func<IQueryable<UserPlay>, IQueryable<UserPlay>>(c =>
-        c.Include(x => x.Championship).Include(x => x.UserGuests).ThenInclude(y => y.Match).ThenInclude(z => z!.TeamA)
-        .Include(x => x.UserGuests).ThenInclude(y => y.Match).ThenInclude(z => z!.TeamB));
-
-        newUserPlay = await _unitOfWOrk.Repository<UserPlay>().GetEntityAsync(x => x.Id == newUserPlayId, include);
+        newUserPlay = await GetUserPlay(newUserPlayId, newUserPlay);
 
         return _mapper.Map<UserPlayResponseDto>(newUserPlay);
+    }
+
+    private async Task<UserPlay> GetUserPlay(Guid newUserPlayId, UserPlay newUserPlay)
+    {
+        var include = new Func<IQueryable<UserPlay>, IQueryable<UserPlay>>(c =>
+                c.Include(x => x.Championship).Include(x => x.UserGuests).ThenInclude(y => y.Match).ThenInclude(z => z!.TeamA)
+                .Include(x => x.UserGuests).ThenInclude(y => y.Match).ThenInclude(z => z!.TeamB));
+
+        newUserPlay = await _unitOfWOrk.Repository<UserPlay>().GetEntityAsync(x => x.Id == newUserPlayId, include);
+        return newUserPlay;
+    }
+
+    private void CreateUserGuests(Guid newUserPlayId, UserGuestUserPlayRequest userGuest)
+    {
+        UserGuest newUserGuest = new()
+        {
+            MatchId = (Guid)userGuest.MatchId!,
+            ScoreTeamAGuessed = (int)userGuest.ScoreTeamAGuessed!,
+            ScoreTeamBGuessed = (int)userGuest.ScoreTeamBGuessed!,
+            GuessStatus = GuessStatus.Sealed,
+            UserPlayId = newUserPlayId,
+        };
+
+        _unitOfWOrk.Repository<UserGuest>().AddEntity(newUserGuest);
+    }
+
+    private async Task<Guid> GetUserId(CreateUserPlayCommand request)
+    {
+        var user = await _userManager.FindByEmailAsync(_authService.GetSessionUserEmail());
+        Guid userId = Guid.Parse(user!.Id);
+
+        if (await _unitOfWOrk.Repository<UserPlay>().Exist(x => x.ChampionshipId == request.ChampionshipId && x.UserId == userId))
+        {
+            throw new BadRequestException($"A {nameof(UserPlay)} for the championship Id {request.ChampionshipId} has already exist");
+        }
+
+        return userId;
     }
 }
