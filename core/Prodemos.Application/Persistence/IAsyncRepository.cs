@@ -8,8 +8,8 @@ public interface IAsyncRepository<T> where T : class
     Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate);
 
     Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate,
-                                   Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy,
-                                   string? includeString,
+                                   Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+                                   Func<IQueryable<T>, IQueryable<T>>? include = null,
                                    bool disableTracking = true);
 
     Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate,
@@ -33,7 +33,7 @@ public interface IAsyncRepository<T> where T : class
     void AddEntity(T entity);
 
     void UpdateEntity(T entity);
-    
+
     void DeleteEntity(T entity);
 
     void AddRange(List<T> entities);

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Prodemos.Application.Persistence;
-using Prodemos.Domain;
 using Prodemos.Infrastructure.Persistence;
 using System.Linq.Expressions;
 
@@ -62,12 +61,12 @@ public class RepositoryBase<T> : IAsyncRepository<T> where T : class
         return await _context.Set<T>().Where(predicate).ToListAsync();
     }
 
-    public async Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy, string? includeString, bool disableTracking = true)
+    public async Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy, Func<IQueryable<T>, IQueryable<T>>? include = null, bool disableTracking = true)
     {
         IQueryable<T> query = _context.Set<T>();
         if (disableTracking) query = query.AsNoTracking();
 
-        if (!string.IsNullOrWhiteSpace(includeString)) query = query.Include(includeString);
+        if (include != null) query = include(query);
 
         if (predicate != null) query = query.Where(predicate);
 

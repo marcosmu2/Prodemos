@@ -33,7 +33,8 @@ public class DeleteTeamCommandHandler : IRequestHandler<DeleteTeamCommand, bool>
         }
         catch (Exception ex)
         {
-            throw;
+            throw new DBException($"Something wrong ocurred when we trying to delete a {nameof(Team)} " +
+                $"with Id {request.Id}, {ex.Message}");
         }
     }
 }

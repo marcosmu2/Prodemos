@@ -17,7 +17,6 @@ public class UserPlayController : ControllerBase
     }
 
     [HttpPost("create")]
-    [RequireAdmin]
     public async Task<ActionResult<UserPlayResponseDto>> CreateUserPlay(CreateUserPlayCommand createUserPlayCommand)
     {
         return Ok(await _mediator.Send(createUserPlayCommand));

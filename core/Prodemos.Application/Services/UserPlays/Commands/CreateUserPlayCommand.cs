@@ -65,7 +65,7 @@ public class CreateUserPlayCommandHandler : IRequestHandler<CreateUserPlayComman
 
     private async Task<UserPlay> GetUserPlay(Guid newUserPlayId, UserPlay newUserPlay)
     {
-        var include = new Func<IQueryable<UserPlay>, IQueryable<UserPlay>>(c =>
+        Func<IQueryable<UserPlay>, IQueryable<UserPlay>> include = new (c =>
                 c.Include(x => x.Championship).Include(x => x.UserGuests).ThenInclude(y => y.Match).ThenInclude(z => z!.TeamA)
                 .Include(x => x.UserGuests).ThenInclude(y => y.Match).ThenInclude(z => z!.TeamB));
 
@@ -80,7 +80,7 @@ public class CreateUserPlayCommandHandler : IRequestHandler<CreateUserPlayComman
             MatchId = (Guid)userGuest.MatchId!,
             ScoreTeamAGuessed = (int)userGuest.ScoreTeamAGuessed!,
             ScoreTeamBGuessed = (int)userGuest.ScoreTeamBGuessed!,
-            GuessStatus = GuessStatus.Sealed,
+            GuessStatus = GuessStatus.Pending,
             UserPlayId = newUserPlayId,
         };
 
