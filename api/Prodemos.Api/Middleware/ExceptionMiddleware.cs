@@ -47,6 +47,10 @@ public class ExceptionMiddleware
                 case BadRequestException badRequestException:
                     statusCode = (int)HttpStatusCode.BadRequest;
                     break;
+
+                case DBException dBException:
+                    statusCode = (int)HttpStatusCode.InternalServerError;
+                    break;
             }
 
             if (string.IsNullOrEmpty(result))
